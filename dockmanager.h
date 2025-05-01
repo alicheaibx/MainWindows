@@ -23,10 +23,10 @@ public:
     QList<ColorSwatch*> dockWidgets() const { return m_dockWidgets; }
     ColorSwatch* dockWidget(const QString &name) const;
 
-    // Add these new methods
     void saveDockWidgetSize(ColorSwatch *swatch);
     QSize savedDockWidgetSize(const QString &name) const;
     void setSizesFixed(bool fixed);
+
 public slots:
     void saveDockWidgetsLayout(QXmlStreamWriter &xmlWriter);
     void loadDockWidgetsLayout(QXmlStreamReader &xmlReader);
@@ -55,6 +55,9 @@ private:
     void updateDockWidgetSizeConstraints(ColorSwatch *swatch);
     void updateTabbedGroupSizes(ColorSwatch *swatch);
     void handleDockWidgetResized(ColorSwatch *swatch);
+    void saveWidgetProperties(QXmlStreamWriter &xmlWriter, QWidget *widget);
+    void loadWidgetProperties(QXmlStreamReader &xmlReader, QWidget *widget);
+
     bool m_sizesFixed = true;
     QMainWindow *m_mainWindow;
     QMenu *m_viewMenu;

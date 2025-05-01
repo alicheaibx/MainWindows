@@ -199,6 +199,9 @@ void DockManager::saveDockWidgetsLayout(QXmlStreamWriter &xmlWriter)
         xmlWriter.writeStartElement("DockWidget");
         xmlWriter.writeAttribute("name", dockWidget->objectName());
 
+        // Save widget properties
+        saveWidgetProperties(xmlWriter, dockWidget->widget());
+
         QSize size = dockWidget->frameGeometry().size();
         xmlWriter.writeStartElement("Size");
         xmlWriter.writeTextElement("width", QString::number(size.width()));
@@ -244,6 +247,35 @@ void DockManager::saveDockWidgetsLayout(QXmlStreamWriter &xmlWriter)
     xmlWriter.writeEndElement();
 }
 
+void DockManager::saveWidgetProperties(QXmlStreamWriter &xmlWriter, QWidget *widget)
+{
+    if (!widget) return;
+
+    xmlWriter.writeStartElement("WidgetProperties");
+
+    xmlWriter.writeTextElement("ObjectName", widget->objectName());
+    xmlWriter.writeTextElement("Geometry", QString("%1,%2,%3,%4")
+                                               .arg(widget->geometry().x())
+                                               .arg(widget->geometry().y())
+                                               .arg(widget->geometry().width())
+                                               .arg(widget->geometry().height()));
+    xmlWriter.writeTextElement("MinimumSize", QString("%1,%2")
+                                                  .arg(widget->minimumSize().width())
+                                                  .arg(widget->minimumSize().height()));
+    xmlWriter.writeTextElement("MaximumSize", QString("%1,%2")
+                                                  .arg(widget->maximumSize().width())
+                                                  .arg(widget->maximumSize().height()));
+
+    if (ColorDock *colorDock = qobject_cast<ColorDock*>(widget)) {
+        xmlWriter.writeTextElement("Color", colorDock->property("colorName").toString());
+        xmlWriter.writeTextElement("CustomSizeHint", QString("%1,%2")
+                                                         .arg(colorDock->customSizeHint().width())
+                                                         .arg(colorDock->customSizeHint().height()));
+    }
+
+    xmlWriter.writeEndElement();
+}
+
 void DockManager::loadDockWidgetsLayout(QXmlStreamReader &xmlReader)
 {
     m_sizesFixed = true;
@@ -271,7 +303,13 @@ void DockManager::loadDockWidgetsLayout(QXmlStreamReader &xmlReader)
 
             while (xmlReader.readNextStartElement()) {
                 QString elementName = xmlReader.name().toString();
-                if (elementName == "Title") {
+                if (elementName == "WidgetProperties") {
+                    if (dockWidgetMap.contains(name)) {
+                        loadWidgetProperties(xmlReader, dockWidgetMap[name]->widget());
+                    } else {
+                        xmlReader.skipCurrentElement();
+                    }
+                } else if (elementName == "Title") {
                     title = xmlReader.readElementText();
                 } else if (elementName == "Visible") {
                     visible = xmlReader.readElementText() == "true";
@@ -360,6 +398,59 @@ void DockManager::loadDockWidgetsLayout(QXmlStreamReader &xmlReader)
             updateDockWidgetSizeConstraints(dockWidget);
         }
     });
+}
+
+void DockManager::loadWidgetProperties(QXmlStreamReader &xmlReader, QWidget *widget)
+{
+    if (!widget) return;
+
+    QString objectName;
+    QRect geometry;
+    QSize minSize, maxSize;
+    QSize customSizeHint;
+    QString color;
+
+    while (xmlReader.readNextStartElement()) {
+        if (xmlReader.name() == "ObjectName") {
+            objectName = xmlReader.readElementText();
+        } else if (xmlReader.name() == "Geometry") {
+            QStringList geo = xmlReader.readElementText().split(',');
+            if (geo.size() == 4) {
+                geometry = QRect(geo[0].toInt(), geo[1].toInt(),
+                                 geo[2].toInt(), geo[3].toInt());
+            }
+        } else if (xmlReader.name() == "MinimumSize") {
+            QStringList size = xmlReader.readElementText().split(',');
+            if (size.size() == 2) {
+                minSize = QSize(size[0].toInt(), size[1].toInt());
+            }
+        } else if (xmlReader.name() == "MaximumSize") {
+            QStringList size = xmlReader.readElementText().split(',');
+            if (size.size() == 2) {
+                maxSize = QSize(size[0].toInt(), size[1].toInt());
+            }
+        } else if (xmlReader.name() == "Color") {
+            color = xmlReader.readElementText();
+        } else if (xmlReader.name() == "CustomSizeHint") {
+            QStringList size = xmlReader.readElementText().split(',');
+            if (size.size() == 2) {
+                customSizeHint = QSize(size[0].toInt(), size[1].toInt());
+            }
+        } else {
+            xmlReader.skipCurrentElement();
+        }
+    }
+
+    widget->setObjectName(objectName);
+    if (!geometry.isNull()) widget->setGeometry(geometry);
+    if (!minSize.isNull()) widget->setMinimumSize(minSize);
+    if (!maxSize.isNull()) widget->setMaximumSize(maxSize);
+
+    if (ColorDock *colorDock = qobject_cast<ColorDock*>(widget)) {
+        if (!customSizeHint.isNull()) {
+            colorDock->setCustomSizeHint(customSizeHint);
+        }
+    }
 }
 
 void DockManager::applySavedSizes()

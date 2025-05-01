@@ -123,14 +123,14 @@
 <context>
     <name>LayoutManager</name>
     <message>
-        <location filename="layoutmanager.cpp" line="17"/>
+        <location filename="layoutmanager.cpp" line="18"/>
         <location filename="layoutmanager.cpp" line="40"/>
-        <location filename="layoutmanager.cpp" line="60"/>
+        <location filename="layoutmanager.cpp" line="62"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="layoutmanager.cpp" line="17"/>
+        <location filename="layoutmanager.cpp" line="18"/>
         <source>Failed to open %1 for writing</source>
         <translation type="unfinished"></translation>
     </message>
@@ -140,7 +140,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="layoutmanager.cpp" line="60"/>
+        <location filename="layoutmanager.cpp" line="62"/>
         <source>Failed to parse XML file: %1</source>
         <translation type="unfinished"></translation>
     </message>

@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QFile>
+#include <QTextEdit>
 
 LayoutManager::LayoutManager(QMainWindow *parent)
     : QObject(parent), m_mainWindow(parent)
@@ -24,8 +25,7 @@ void LayoutManager::saveLayoutToFile(const QString &fileName)
     xmlWriter.writeStartElement("MainWindowLayout");
 
     saveMainWindowGeometry(xmlWriter);
-
-    // Save dock widgets layout (delegated to DockManager)
+    saveCentralWidgetProperties(xmlWriter);
     emit saveDockWidgetsLayoutRequested(xmlWriter);
 
     xmlWriter.writeEndElement(); // MainWindowLayout
@@ -48,6 +48,8 @@ void LayoutManager::loadLayoutFromFile(const QString &fileName)
             while (xmlReader.readNextStartElement()) {
                 if (xmlReader.name() == "MainWindowGeometry")
                     loadMainWindowGeometry(xmlReader);
+                else if (xmlReader.name() == "CentralWidget")
+                    loadCentralWidgetProperties(xmlReader);
                 else if (xmlReader.name() == "DockWidgets")
                     emit loadDockWidgetsLayoutRequested(xmlReader);
                 else
@@ -109,4 +111,82 @@ void LayoutManager::loadMainWindowGeometry(QXmlStreamReader &xmlReader)
         options &= ~QMainWindow::AllowNestedDocks;
     }
     m_mainWindow->setDockOptions(options);
+}
+
+void LayoutManager::saveCentralWidgetProperties(QXmlStreamWriter &xmlWriter)
+{
+    QWidget *central = m_mainWindow->centralWidget();
+    if (!central) return;
+
+    xmlWriter.writeStartElement("CentralWidget");
+
+    xmlWriter.writeTextElement("ObjectName", central->objectName());
+    xmlWriter.writeTextElement("Geometry", QString("%1,%2,%3,%4")
+                                               .arg(central->geometry().x())
+                                               .arg(central->geometry().y())
+                                               .arg(central->geometry().width())
+                                               .arg(central->geometry().height()));
+    xmlWriter.writeTextElement("MinimumSize", QString("%1,%2")
+                                                  .arg(central->minimumSize().width())
+                                                  .arg(central->minimumSize().height()));
+    xmlWriter.writeTextElement("MaximumSize", QString("%1,%2")
+                                                  .arg(central->maximumSize().width())
+                                                  .arg(central->maximumSize().height()));
+
+    if (QTextEdit *textEdit = qobject_cast<QTextEdit*>(central)) {
+        xmlWriter.writeTextElement("Text", textEdit->toPlainText());
+        xmlWriter.writeTextElement("ReadOnly", textEdit->isReadOnly() ? "true" : "false");
+    }
+
+    xmlWriter.writeEndElement(); // CentralWidget
+}
+
+void LayoutManager::loadCentralWidgetProperties(QXmlStreamReader &xmlReader)
+{
+    QWidget *central = m_mainWindow->centralWidget();
+    if (!central) return;
+
+    QString objectName;
+    QRect geometry;
+    QSize minSize, maxSize;
+    QString text;
+    bool readOnly = false;
+
+    while (xmlReader.readNextStartElement()) {
+        if (xmlReader.name() == "ObjectName") {
+            objectName = xmlReader.readElementText();
+        } else if (xmlReader.name() == "Geometry") {
+            QStringList geo = xmlReader.readElementText().split(',');
+            if (geo.size() == 4) {
+                geometry = QRect(geo[0].toInt(), geo[1].toInt(),
+                                 geo[2].toInt(), geo[3].toInt());
+            }
+        } else if (xmlReader.name() == "MinimumSize") {
+            QStringList size = xmlReader.readElementText().split(',');
+            if (size.size() == 2) {
+                minSize = QSize(size[0].toInt(), size[1].toInt());
+            }
+        } else if (xmlReader.name() == "MaximumSize") {
+            QStringList size = xmlReader.readElementText().split(',');
+            if (size.size() == 2) {
+                maxSize = QSize(size[0].toInt(), size[1].toInt());
+            }
+        } else if (xmlReader.name() == "Text") {
+            text = xmlReader.readElementText();
+        } else if (xmlReader.name() == "ReadOnly") {
+            readOnly = xmlReader.readElementText() == "true";
+        } else {
+            xmlReader.skipCurrentElement();
+        }
+    }
+
+    central->setObjectName(objectName);
+    if (!geometry.isNull()) central->setGeometry(geometry);
+    if (!minSize.isNull()) central->setMinimumSize(minSize);
+    if (!maxSize.isNull()) central->setMaximumSize(maxSize);
+
+    if (QTextEdit *textEdit = qobject_cast<QTextEdit*>(central)) {
+        textEdit->setPlainText(text);
+        textEdit->setReadOnly(readOnly);
+    }
 }

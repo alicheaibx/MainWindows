@@ -23,6 +23,8 @@ signals:
 private:
     void saveMainWindowGeometry(QXmlStreamWriter &xmlWriter);
     void loadMainWindowGeometry(QXmlStreamReader &xmlReader);
+    void saveCentralWidgetProperties(QXmlStreamWriter &xmlWriter);
+    void loadCentralWidgetProperties(QXmlStreamReader &xmlReader);
 
     QMainWindow *m_mainWindow;
 };

@@ -135,6 +135,9 @@ class ColorDock : public QFrame
 public:
     explicit ColorDock(const QString &color, QWidget *parent = nullptr);
 
+    // Add this function
+    QString colorName() const { return m_color; }
+
     QSize sizeHint() const override { return m_szHint; }
     QSize minimumSizeHint() const override { return m_minSzHint; }
 
