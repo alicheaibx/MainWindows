@@ -57,7 +57,7 @@ private:
     void handleDockWidgetResized(ColorSwatch *swatch);
     void saveWidgetProperties(QXmlStreamWriter &xmlWriter, QWidget *widget);
     void loadWidgetProperties(QXmlStreamReader &xmlReader, QWidget *widget);
-
+    void applySavedSizesDelayed();  // Add this line
     bool m_sizesFixed = true;
     QMainWindow *m_mainWindow;
     QMenu *m_viewMenu;

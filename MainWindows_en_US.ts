@@ -115,7 +115,7 @@
 <context>
     <name>DockManager</name>
     <message>
-        <location filename="dockmanager.cpp" line="10"/>
+        <location filename="dockmanager.cpp" line="12"/>
         <source>&amp;View</source>
         <translation type="unfinished"></translation>
     </message>

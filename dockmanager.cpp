@@ -5,6 +5,8 @@
 #include <QDebug>
 #include <QTimer>
 #include <QEvent>
+#include <QApplication>
+#include <QMainWindow>
 
 DockManager::DockManager(QMainWindow *parent)
     : QObject(parent), m_mainWindow(parent), m_viewMenu(new QMenu(tr("&View"), parent))
@@ -278,22 +280,26 @@ void DockManager::saveWidgetProperties(QXmlStreamWriter &xmlWriter, QWidget *wid
 
 void DockManager::loadDockWidgetsLayout(QXmlStreamReader &xmlReader)
 {
+    qDebug() << "Starting layout load...";
     m_sizesFixed = true;
 
     QMap<QString, ColorSwatch*> dockWidgetMap;
     for (ColorSwatch *dockWidget : m_dockWidgets) {
         dockWidgetMap[dockWidget->objectName()] = dockWidget;
+        qDebug() << "Preparing dock widget:" << dockWidget->objectName()
+                 << "Current size:" << dockWidget->size();
     }
 
     QMap<ColorSwatch*, QList<ColorSwatch*>> tabbedGroups;
 
+    // First pass: Load all properties except sizes
     while (xmlReader.readNextStartElement()) {
         if (xmlReader.name() == "DockWidget") {
             QString name = xmlReader.attributes().value("name").toString();
             QString title;
             bool visible = true;
             bool floating = false;
-            QSize size(200, 200);
+            QSize size;
             QString dockAreaStr;
             QPoint floatingPos;
             QDockWidget::DockWidgetFeatures features = QDockWidget::DockWidgetClosable |
@@ -327,6 +333,7 @@ void DockManager::loadDockWidgetsLayout(QXmlStreamReader &xmlReader)
                             size.setHeight(xmlReader.readElementText().toInt());
                         }
                     }
+                    qDebug() << "Loaded size for" << name << ":" << size;
                 } else if (elementName == "DockArea") {
                     dockAreaStr = xmlReader.readElementText();
                 } else if (elementName == "Geometry") {
@@ -357,11 +364,17 @@ void DockManager::loadDockWidgetsLayout(QXmlStreamReader &xmlReader)
                 ColorSwatch *dockWidget = dockWidgetMap[name];
                 m_blockResizeUpdates = true;
 
+                // Apply basic properties first
                 dockWidget->setWindowTitle(title);
                 dockWidget->setVisible(visible);
                 dockWidget->setFeatures(features);
                 dockWidget->setAllowedAreas(allowedAreas);
-                m_dockWidgetSizes[dockWidget] = size;
+
+                // Store the size for later application
+                if (size.isValid()) {
+                    m_dockWidgetSizes[dockWidget] = size;
+                    qDebug() << "Stored size for" << name << ":" << size;
+                }
 
                 if (floating) {
                     dockWidget->setFloating(true);
@@ -379,24 +392,61 @@ void DockManager::loadDockWidgetsLayout(QXmlStreamReader &xmlReader)
                 }
 
                 m_blockResizeUpdates = false;
-                updateDockWidgetSizeConstraints(dockWidget);
             }
         }
     }
 
+    // Apply tabbed groups
     for (auto it = tabbedGroups.begin(); it != tabbedGroups.end(); ++it) {
         for (ColorSwatch *tabbedDock : it.value()) {
             m_mainWindow->tabifyDockWidget(it.key(), tabbedDock);
         }
     }
 
-    applySavedSizes();
+    // Use a single-shot timer to apply sizes after a delay
+    QTimer::singleShot(100, this, [this]() {
+        applySavedSizesDelayed();
+    });
+}
 
-    QTimer::singleShot(30, this, [this]() {
-        m_sizesFixed = false;
-        for (ColorSwatch *dockWidget : m_dockWidgets) {
-            updateDockWidgetSizeConstraints(dockWidget);
+void DockManager::applySavedSizesDelayed()
+{
+    qDebug() << "Applying saved sizes with delay...";
+    m_blockResizeUpdates = true;
+
+    // First pass: Apply minimum sizes
+    for (ColorSwatch *dockWidget : m_dockWidgets) {
+        if (m_dockWidgetSizes.contains(dockWidget)) {
+            QSize savedSize = m_dockWidgetSizes[dockWidget];
+            dockWidget->setMinimumSize(savedSize);
+            qDebug() << "Set minimum size for" << dockWidget->objectName()
+                     << "to" << savedSize;
         }
+    }
+
+    // Second pass after a short delay
+    QTimer::singleShot(50, this, [this]() {
+        qDebug() << "Applying actual sizes...";
+        for (ColorSwatch *dockWidget : m_dockWidgets) {
+            if (m_dockWidgetSizes.contains(dockWidget)) {
+                QSize savedSize = m_dockWidgetSizes[dockWidget];
+                dockWidget->resize(savedSize);
+                qDebug() << "Set size for" << dockWidget->objectName()
+                         << "to" << savedSize << "actual size:" << dockWidget->size();
+            }
+        }
+
+        // Final pass to release constraints
+        QTimer::singleShot(100, this, [this]() {
+            qDebug() << "Releasing size constraints...";
+            m_sizesFixed = false;
+            m_blockResizeUpdates = false;
+            for (ColorSwatch *dockWidget : m_dockWidgets) {
+                updateDockWidgetSizeConstraints(dockWidget);
+                qDebug() << "Final size for" << dockWidget->objectName()
+                         << ":" << dockWidget->size();
+            }
+        });
     });
 }
 
