@@ -11,7 +11,6 @@
 #include <QShowEvent>
 #include <QDebug>
 #include <QTimer>
-#include <QStatusBar>
 
 MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
     : QMainWindow(parent, flags)
@@ -21,16 +20,11 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
     setDockNestingEnabled(true);
 
     setupCentralWidget();
-    setupStatusBar();
 
     // Initialize managers
     m_dockManager = new DockManager(this);
     m_layoutManager = new LayoutManager(this);
     m_menuManager = new MenuManager(this);
-
-    // Register widgets for layout management
-    m_layoutManager->registerWidget("centralWidget", centralWidget());
-    m_layoutManager->registerWidget("statusBar", statusBar());
 
     // Connect menu signals
     connect(m_menuManager, &MenuManager::saveLayoutRequested, this, &MainWindow::saveLayout);
@@ -43,9 +37,9 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
     connect(m_menuManager, &MenuManager::loadLayout5Requested, this, &MainWindow::loadLayout5);
 
     // Connect layout manager signals to dock manager
-    connect(m_layoutManager, &LayoutManager::saveWidgetsLayoutRequested,
+    connect(m_layoutManager, &LayoutManager::saveDockWidgetsLayoutRequested,
             m_dockManager, &DockManager::saveDockWidgetsLayout);
-    connect(m_layoutManager, &LayoutManager::loadWidgetsLayoutRequested,
+    connect(m_layoutManager, &LayoutManager::loadDockWidgetsLayoutRequested,
             m_dockManager, &DockManager::loadDockWidgetsLayout);
 
     // Load default layout if exists
@@ -65,7 +59,6 @@ MainWindow::~MainWindow()
 void MainWindow::setupCentralWidget()
 {
     QTextEdit *center = new QTextEdit(this);
-    center->setObjectName("centralTextEdit");
     center->setReadOnly(true);
     center->setMinimumSize(400, 205);
     center->setText(tr("This is the central widget.\n\n"
@@ -74,14 +67,6 @@ void MainWindow::setupCentralWidget()
                        "Layouts can be saved and loaded from the File menu.\n"
                        "Use the buttons below to quickly switch between layouts."));
     setCentralWidget(center);
-}
-
-void MainWindow::setupStatusBar()
-{
-    QStatusBar *statusBar = new QStatusBar(this);
-    statusBar->setObjectName("mainStatusBar");
-    statusBar->showMessage(tr("Ready"));
-    setStatusBar(statusBar);
 }
 
 void MainWindow::saveLayout()
@@ -155,7 +140,6 @@ void MainWindow::loadLayout5()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-
     event->accept();
 }
 
@@ -163,11 +147,4 @@ void MainWindow::showEvent(QShowEvent *event)
 {
     QMainWindow::showEvent(event);
     emit shown();
-
-    // Apply any pending layout updates after window is shown
-    QTimer::singleShot(100, this, [this]() {
-        if (m_dockManager) {
-            m_dockManager->applySavedSizes();
-        }
-    });
 }
