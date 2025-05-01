@@ -122,7 +122,8 @@ bool DockManager::eventFilter(QObject *watched, QEvent *event)
     if (event->type() == QEvent::Resize) {
         ColorSwatch *swatch = qobject_cast<ColorSwatch*>(watched);
         if (swatch && !m_blockResizeUpdates && !m_sizesFixed) {
-            handleDockWidgetResized(swatch);
+            m_dockWidgetSizes[swatch] = swatch->frameGeometry().size();
+            updateTabbedGroupSizes(swatch);
         }
     }
     return QObject::eventFilter(watched, event);
@@ -131,7 +132,7 @@ bool DockManager::eventFilter(QObject *watched, QEvent *event)
 void DockManager::handleDockWidgetResized(ColorSwatch *swatch)
 {
     Qt::DockWidgetArea area = m_dockWidgetAreas.value(swatch, Qt::NoDockWidgetArea);
-    m_dockWidgetSizes[swatch] = swatch->size();
+    m_dockWidgetSizes[swatch] = swatch->frameGeometry().size();
     updateTabbedGroupSizes(swatch);
 }
 
@@ -144,7 +145,7 @@ void DockManager::updateTabbedGroupSizes(ColorSwatch *swatch)
             ColorSwatch *tabbedSwatch = qobject_cast<ColorSwatch*>(tabbedDock);
             if (tabbedSwatch) {
                 tabbedSwatch->resize(swatch->size());
-                m_dockWidgetSizes[tabbedSwatch] = swatch->size();
+                m_dockWidgetSizes[tabbedSwatch] = swatch->frameGeometry().size();
             }
         }
         m_blockResizeUpdates = false;
@@ -175,13 +176,13 @@ void DockManager::updateDockWidgetSizeConstraints(ColorSwatch *swatch)
     if (!swatch) return;
 
     if (m_sizesFixed) {
-        // Fixed size mode - set both min and max to the saved size
         if (m_dockWidgetSizes.contains(swatch)) {
-            swatch->setMinimumSize(m_dockWidgetSizes[swatch]);
-            swatch->setMaximumSize(m_dockWidgetSizes[swatch]);
+            QSize frameSize = m_dockWidgetSizes[swatch];
+            QSize clientSize = frameSize - (swatch->frameGeometry().size() - swatch->size());
+            swatch->setMinimumSize(clientSize);
+            swatch->setMaximumSize(clientSize);
         }
     } else {
-        // Normal resize mode
         swatch->setMinimumSize(150, 150);
         swatch->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
     }
@@ -198,7 +199,7 @@ void DockManager::saveDockWidgetsLayout(QXmlStreamWriter &xmlWriter)
         xmlWriter.writeStartElement("DockWidget");
         xmlWriter.writeAttribute("name", dockWidget->objectName());
 
-        QSize size = m_dockWidgetSizes.value(dockWidget, dockWidget->size());
+        QSize size = dockWidget->frameGeometry().size();
         xmlWriter.writeStartElement("Size");
         xmlWriter.writeTextElement("width", QString::number(size.width()));
         xmlWriter.writeTextElement("height", QString::number(size.height()));
@@ -211,7 +212,7 @@ void DockManager::saveDockWidgetsLayout(QXmlStreamWriter &xmlWriter)
         xmlWriter.writeTextElement("AllowedAreas", QString::number(static_cast<int>(dockWidget->allowedAreas())));
 
         if (dockWidget->isFloating()) {
-            QRect geo = dockWidget->geometry();
+            QRect geo = dockWidget->frameGeometry();
             xmlWriter.writeStartElement("Geometry");
             xmlWriter.writeTextElement("x", QString::number(geo.x()));
             xmlWriter.writeTextElement("y", QString::number(geo.y()));
@@ -245,7 +246,7 @@ void DockManager::saveDockWidgetsLayout(QXmlStreamWriter &xmlWriter)
 
 void DockManager::loadDockWidgetsLayout(QXmlStreamReader &xmlReader)
 {
-    m_sizesFixed = true; // Start in fixed size mode
+    m_sizesFixed = true;
 
     QMap<QString, ColorSwatch*> dockWidgetMap;
     for (ColorSwatch *dockWidget : m_dockWidgets) {
@@ -351,10 +352,8 @@ void DockManager::loadDockWidgetsLayout(QXmlStreamReader &xmlReader)
         }
     }
 
-    // Apply saved sizes as fixed sizes
     applySavedSizes();
 
-    // After a delay, allow resizing
     QTimer::singleShot(30, this, [this]() {
         m_sizesFixed = false;
         for (ColorSwatch *dockWidget : m_dockWidgets) {
@@ -368,9 +367,11 @@ void DockManager::applySavedSizes()
     m_blockResizeUpdates = true;
     for (ColorSwatch *dockWidget : m_dockWidgets) {
         if (m_dockWidgetSizes.contains(dockWidget)) {
-            dockWidget->setMinimumSize(m_dockWidgetSizes[dockWidget]);
-            dockWidget->setMaximumSize(m_dockWidgetSizes[dockWidget]);
-            dockWidget->resize(m_dockWidgetSizes[dockWidget]);
+            QSize frameSize = m_dockWidgetSizes[dockWidget];
+            QSize clientSize = frameSize - (dockWidget->frameGeometry().size() - dockWidget->size());
+            dockWidget->setMinimumSize(clientSize);
+            dockWidget->setMaximumSize(clientSize);
+            dockWidget->resize(clientSize);
         }
     }
     m_blockResizeUpdates = false;
@@ -379,7 +380,7 @@ void DockManager::applySavedSizes()
 void DockManager::saveDockWidgetSize(ColorSwatch *swatch)
 {
     if (swatch) {
-        m_dockWidgetSizes[swatch] = swatch->size();
+        m_dockWidgetSizes[swatch] = swatch->frameGeometry().size();
         updateTabbedGroupSizes(swatch);
     }
 }
@@ -387,7 +388,7 @@ void DockManager::saveDockWidgetSize(ColorSwatch *swatch)
 QSize DockManager::savedDockWidgetSize(const QString &name) const
 {
     if (ColorSwatch *swatch = dockWidget(name)) {
-        return m_dockWidgetSizes.value(swatch, swatch->size());
+        return m_dockWidgetSizes.value(swatch, swatch->frameGeometry().size());
     }
     return QSize();
 }

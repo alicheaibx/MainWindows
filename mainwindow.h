@@ -1,3 +1,4 @@
+// mainwindow.h (updated)
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -34,6 +35,7 @@ private slots:
 
 private:
     void setupCentralWidget();
+    void setupStatusBar();  // ADD THIS DECLARATION
 
     DockManager *m_dockManager;
     LayoutManager *m_layoutManager;

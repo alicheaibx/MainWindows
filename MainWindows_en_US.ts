@@ -123,24 +123,24 @@
 <context>
     <name>LayoutManager</name>
     <message>
-        <location filename="layoutmanager.cpp" line="17"/>
-        <location filename="layoutmanager.cpp" line="40"/>
+        <location filename="layoutmanager.cpp" line="28"/>
         <location filename="layoutmanager.cpp" line="60"/>
+        <location filename="layoutmanager.cpp" line="93"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="layoutmanager.cpp" line="17"/>
+        <location filename="layoutmanager.cpp" line="29"/>
         <source>Failed to open %1 for writing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="layoutmanager.cpp" line="40"/>
+        <location filename="layoutmanager.cpp" line="61"/>
         <source>Failed to open %1 for reading</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="layoutmanager.cpp" line="60"/>
+        <location filename="layoutmanager.cpp" line="94"/>
         <source>Failed to parse XML file: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -153,7 +153,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="64"/>
+        <location filename="mainwindow.cpp" line="71"/>
         <source>This is the central widget.
 
 You can dock other widgets around this area.
@@ -163,74 +163,79 @@ Use the buttons below to quickly switch between layouts.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="75"/>
+        <location filename="mainwindow.cpp" line="83"/>
+        <source>Ready</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="90"/>
         <source>Save Layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="75"/>
+        <location filename="mainwindow.cpp" line="90"/>
         <source>Layout saved to layout.xml</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="80"/>
-        <location filename="mainwindow.cpp" line="83"/>
+        <location filename="mainwindow.cpp" line="95"/>
+        <location filename="mainwindow.cpp" line="98"/>
         <source>Save Layout As</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="80"/>
-        <location filename="mainwindow.cpp" line="89"/>
+        <location filename="mainwindow.cpp" line="95"/>
+        <location filename="mainwindow.cpp" line="104"/>
         <source>XML Files (*.xml)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="83"/>
+        <location filename="mainwindow.cpp" line="98"/>
         <source>Layout saved to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="89"/>
-        <location filename="mainwindow.cpp" line="92"/>
+        <location filename="mainwindow.cpp" line="104"/>
+        <location filename="mainwindow.cpp" line="107"/>
         <source>Load Layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="92"/>
+        <location filename="mainwindow.cpp" line="107"/>
         <source>Layout loaded from %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="101"/>
+        <location filename="mainwindow.cpp" line="116"/>
         <source>layout.xml not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="101"/>
-        <location filename="mainwindow.cpp" line="110"/>
-        <location filename="mainwindow.cpp" line="119"/>
-        <location filename="mainwindow.cpp" line="128"/>
-        <location filename="mainwindow.cpp" line="137"/>
+        <location filename="mainwindow.cpp" line="116"/>
+        <location filename="mainwindow.cpp" line="125"/>
+        <location filename="mainwindow.cpp" line="134"/>
+        <location filename="mainwindow.cpp" line="143"/>
+        <location filename="mainwindow.cpp" line="152"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="110"/>
+        <location filename="mainwindow.cpp" line="125"/>
         <source>layout2.xml not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="119"/>
+        <location filename="mainwindow.cpp" line="134"/>
         <source>layout3.xml not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="128"/>
+        <location filename="mainwindow.cpp" line="143"/>
         <source>layout4.xml not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="137"/>
+        <location filename="mainwindow.cpp" line="152"/>
         <source>layout5.xml not found</source>
         <translation type="unfinished"></translation>
     </message>
