@@ -403,12 +403,45 @@ void DockManager::loadDockWidgetsLayout(QXmlStreamReader &xmlReader)
         }
     }
 
-    // Use a single-shot timer to apply sizes after a delay
-    QTimer::singleShot(100, this, [this]() {
-        applySavedSizesDelayed();
+    // Three-stage size application process
+    QTimer::singleShot(50, this, [this]() {
+        qDebug() << "Stage 1: Setting size constraints...";
+        m_blockResizeUpdates = true;
+        for (ColorSwatch *dockWidget : m_dockWidgets) {
+            if (m_dockWidgetSizes.contains(dockWidget)) {
+                QSize savedSize = m_dockWidgetSizes[dockWidget];
+                dockWidget->setMinimumSize(savedSize);
+                dockWidget->setMaximumSize(savedSize);
+                qDebug() << "Set constraints for" << dockWidget->objectName()
+                         << "to" << savedSize;
+            }
+        }
+
+        QTimer::singleShot(100, this, [this]() {
+            qDebug() << "Stage 2: Applying actual sizes...";
+            for (ColorSwatch *dockWidget : m_dockWidgets) {
+                if (m_dockWidgetSizes.contains(dockWidget)) {
+                    QSize savedSize = m_dockWidgetSizes[dockWidget];
+                    dockWidget->resize(savedSize);
+                    qDebug() << "Set size for" << dockWidget->objectName()
+                             << "to" << savedSize << "actual size:" << dockWidget->size();
+                }
+            }
+
+            QTimer::singleShot(50, this, [this]() {
+                qDebug() << "Stage 3: Releasing constraints...";
+                m_sizesFixed = false;
+                m_blockResizeUpdates = false;
+                for (ColorSwatch *dockWidget : m_dockWidgets) {
+                    dockWidget->setMinimumSize(150, 150);
+                    dockWidget->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+                    qDebug() << "Final size for" << dockWidget->objectName()
+                             << ":" << dockWidget->size();
+                }
+            });
+        });
     });
 }
-
 void DockManager::applySavedSizesDelayed()
 {
     qDebug() << "Applying saved sizes with delay...";

@@ -42,11 +42,18 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
     connect(m_layoutManager, &LayoutManager::loadDockWidgetsLayoutRequested,
             m_dockManager, &DockManager::loadDockWidgetsLayout);
 
-    // Load default layout if exists
-    QFile layoutFile("layout.xml");
-    if (layoutFile.exists()) {
-        m_layoutManager->loadLayoutFromFile("layout.xml");
-    }
+    // Connect the shown signal to load the layout after the window is visible
+    connect(this, &MainWindow::shown, this, [this]() {
+        QTimer::singleShot(100, this, [this]() {
+            QFile layoutFile("layout.xml");
+            if (layoutFile.exists()) {
+                qDebug() << "Loading layout.xml...";
+                m_layoutManager->loadLayoutFromFile("layout.xml");
+            } else {
+                qDebug() << "No layout.xml found";
+            }
+        });
+    }, Qt::QueuedConnection);
 }
 
 MainWindow::~MainWindow()
