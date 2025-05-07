@@ -15,7 +15,6 @@
 #include <QBitmap>
 #include <QFrame>
 
-// Color definitions
 QColor bgColorForName(const QString &name)
 {
     if (name == "Black") return QColor("#D8D8D8");
@@ -50,9 +49,8 @@ static void render_qt_text(QPainter *painter, int w, int h, const QColor &color)
     painter->drawPath(path);
 }
 
-// ColorDock implementation
 ColorDock::ColorDock(const QString &c, QWidget *parent)
-    : QFrame(parent), m_color(c), m_szHint(-1, -1), m_minSzHint(125, 75)
+    : QFrame(parent), m_color(c)
 {
     QFont font = this->font();
     font.setPointSize(8);
@@ -68,60 +66,6 @@ void ColorDock::paintEvent(QPaintEvent *event)
     render_qt_text(&p, width(), height(), fgColorForName(m_color));
 }
 
-void ColorDock::setCustomSizeHint(const QSize &size)
-{
-    if (m_szHint != size) {
-        m_szHint = size;
-        updateGeometry();
-    }
-}
-
-static QSpinBox *createSpinBox(int value, QWidget *parent, int max = 1000)
-{
-    QSpinBox *result = new QSpinBox(parent);
-    result->setMinimum(-1);
-    result->setMaximum(max);
-    result->setValue(value);
-    return result;
-}
-
-void ColorDock::changeSizeHints()
-{
-    QDialog dialog;
-    dialog.setWindowFlags(dialog.windowFlags() & ~Qt::WindowContextHelpButtonHint);
-    dialog.setWindowTitle(m_color);
-
-    QVBoxLayout *topLayout = new QVBoxLayout(&dialog);
-    QGridLayout *inputLayout = new QGridLayout();
-    topLayout->addLayout(inputLayout);
-
-    inputLayout->addWidget(new QLabel(tr("Size Hint:")), 0, 0);
-    inputLayout->addWidget(createSpinBox(m_szHint.width(), &dialog), 0, 1);
-    inputLayout->addWidget(createSpinBox(m_szHint.height(), &dialog), 0, 2);
-
-    inputLayout->addWidget(new QLabel(tr("Min Size Hint:")), 1, 0);
-    inputLayout->addWidget(createSpinBox(m_minSzHint.width(), &dialog), 1, 1);
-    inputLayout->addWidget(createSpinBox(m_minSzHint.height(), &dialog), 1, 2);
-
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    connect(buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
-    connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
-    topLayout->addWidget(buttonBox);
-
-    if (dialog.exec() == QDialog::Accepted) {
-        m_szHint = QSize(
-            qobject_cast<QSpinBox*>(inputLayout->itemAtPosition(0, 1)->widget())->value(),
-            qobject_cast<QSpinBox*>(inputLayout->itemAtPosition(0, 2)->widget())->value()
-            );
-        m_minSzHint = QSize(
-            qobject_cast<QSpinBox*>(inputLayout->itemAtPosition(1, 1)->widget())->value(),
-            qobject_cast<QSpinBox*>(inputLayout->itemAtPosition(1, 2)->widget())->value()
-            );
-        updateGeometry();
-    }
-}
-
-// ColorSwatch implementation
 ColorSwatch::ColorSwatch(const QString &colorName, QMainWindow *parent, Qt::WindowFlags flags)
     : QDockWidget(parent, flags), m_colorName(colorName), m_mainWindow(parent)
 {
@@ -145,18 +89,6 @@ ColorSwatch::ColorSwatch(const QString &colorName, QMainWindow *parent, Qt::Wind
 ColorSwatch::~ColorSwatch()
 {
     delete m_colorDock;
-}
-
-void ColorSwatch::setCustomSizeHint(const QSize &size)
-{
-    if (m_colorDock) {
-        m_colorDock->setCustomSizeHint(size);
-    }
-}
-
-QSize ColorSwatch::customSizeHint() const
-{
-    return m_colorDock ? m_colorDock->customSizeHint() : QSize();
 }
 
 void ColorSwatch::setFeatures(QDockWidget::DockWidgetFeatures features)
@@ -185,15 +117,9 @@ bool ColorSwatch::isAreaAllowed(Qt::DockWidgetArea area) const
 {
     return allowedAreas() & area;
 }
-void ColorSwatch::changeSizeHints()
-{
-    if (m_colorDock) {
-        m_colorDock->changeSizeHints();
-    }
-}
+
 void ColorSwatch::setupActions()
 {
-    // Feature actions
     m_closableAction = new QAction(tr("Closable"), this);
     m_closableAction->setCheckable(true);
     connect(m_closableAction, &QAction::triggered, this, &ColorSwatch::changeClosable);
@@ -214,7 +140,6 @@ void ColorSwatch::setupActions()
     m_verticalTitleBarAction->setCheckable(true);
     connect(m_verticalTitleBarAction, &QAction::triggered, this, &ColorSwatch::changeVerticalTitleBar);
 
-    // Allowed areas actions
     m_allowedAreasActions = new QActionGroup(this);
     m_allowedAreasActions->setExclusive(false);
 
@@ -239,7 +164,6 @@ void ColorSwatch::setupActions()
     m_allowedAreasActions->addAction(m_allowTopAction);
     m_allowedAreasActions->addAction(m_allowBottomAction);
 
-    // Area actions
     m_areaActions = new QActionGroup(this);
     m_areaActions->setExclusive(true);
 
@@ -264,7 +188,6 @@ void ColorSwatch::setupActions()
     m_areaActions->addAction(m_topAction);
     m_areaActions->addAction(m_bottomAction);
 
-    // Connect action dependencies
     connect(m_movableAction, &QAction::triggered, m_areaActions, &QActionGroup::setEnabled);
     connect(m_movableAction, &QAction::triggered, m_allowedAreasActions, &QActionGroup::setEnabled);
     connect(m_floatableAction, &QAction::triggered, m_floatingAction, &QAction::setEnabled);
@@ -291,9 +214,6 @@ void ColorSwatch::setupMenus()
     m_menu = new QMenu(m_colorName, this);
     m_menu->addAction(toggleViewAction());
     m_menu->addAction(tr("Raise"), this, &QWidget::raise);
-    m_menu->addAction(tr("Change Size Hints..."), this, [this]() {
-        if (m_colorDock) m_colorDock->changeSizeHints();
-    });
     m_menu->addSeparator();
     m_menu->addAction(m_closableAction);
     m_menu->addAction(m_movableAction);
@@ -516,7 +436,6 @@ void ColorSwatch::changeVerticalTitleBar(bool on)
                    : features() & ~QDockWidget::DockWidgetVerticalTitleBar);
 }
 
-// BlueTitleBar implementation
 BlueTitleBar::BlueTitleBar(QWidget *parent)
     : QWidget(parent),
     m_leftPm(QPixmap(":/res/titlebarLeft.png")),
@@ -660,5 +579,3 @@ void BlueTitleBar::updateMask()
 
     dw->setMask(bitmap);
 }
-
-

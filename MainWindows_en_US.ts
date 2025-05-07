@@ -2,113 +2,95 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_US">
 <context>
-    <name>ColorDock</name>
-    <message>
-        <location filename="colorswatch.cpp" line="98"/>
-        <source>Size Hint:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="colorswatch.cpp" line="102"/>
-        <source>Min Size Hint:</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>ColorSwatch</name>
     <message>
-        <location filename="colorswatch.cpp" line="197"/>
+        <location filename="colorswatch.cpp" line="123"/>
         <source>Closable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="colorswatch.cpp" line="201"/>
+        <location filename="colorswatch.cpp" line="127"/>
         <source>Movable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="colorswatch.cpp" line="205"/>
+        <location filename="colorswatch.cpp" line="131"/>
         <source>Floatable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="colorswatch.cpp" line="209"/>
+        <location filename="colorswatch.cpp" line="135"/>
         <source>Floating</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="colorswatch.cpp" line="213"/>
+        <location filename="colorswatch.cpp" line="139"/>
         <source>Vertical title bar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="colorswatch.cpp" line="221"/>
+        <location filename="colorswatch.cpp" line="146"/>
         <source>Allow on Left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="colorswatch.cpp" line="225"/>
+        <location filename="colorswatch.cpp" line="150"/>
         <source>Allow on Right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="colorswatch.cpp" line="229"/>
+        <location filename="colorswatch.cpp" line="154"/>
         <source>Allow on Top</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="colorswatch.cpp" line="233"/>
+        <location filename="colorswatch.cpp" line="158"/>
         <source>Allow on Bottom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="colorswatch.cpp" line="246"/>
+        <location filename="colorswatch.cpp" line="170"/>
         <source>Place on Left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="colorswatch.cpp" line="250"/>
+        <location filename="colorswatch.cpp" line="174"/>
         <source>Place on Right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="colorswatch.cpp" line="254"/>
+        <location filename="colorswatch.cpp" line="178"/>
         <source>Place on Top</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="colorswatch.cpp" line="258"/>
+        <location filename="colorswatch.cpp" line="182"/>
         <source>Place on Bottom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="colorswatch.cpp" line="277"/>
+        <location filename="colorswatch.cpp" line="200"/>
         <source>Tab into</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="colorswatch.cpp" line="280"/>
+        <location filename="colorswatch.cpp" line="203"/>
         <source>Split horizontally into</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="colorswatch.cpp" line="283"/>
+        <location filename="colorswatch.cpp" line="206"/>
         <source>Split vertically into</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="colorswatch.cpp" line="286"/>
+        <location filename="colorswatch.cpp" line="209"/>
         <source>Modified</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="colorswatch.cpp" line="293"/>
+        <location filename="colorswatch.cpp" line="216"/>
         <source>Raise</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="colorswatch.cpp" line="294"/>
-        <source>Change Size Hints...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

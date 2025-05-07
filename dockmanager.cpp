@@ -270,9 +270,7 @@ void DockManager::saveWidgetProperties(QXmlStreamWriter &xmlWriter, QWidget *wid
 
     if (ColorDock *colorDock = qobject_cast<ColorDock*>(widget)) {
         xmlWriter.writeTextElement("Color", colorDock->property("colorName").toString());
-        xmlWriter.writeTextElement("CustomSizeHint", QString("%1,%2")
-                                                         .arg(colorDock->customSizeHint().width())
-                                                         .arg(colorDock->customSizeHint().height()));
+
     }
 
     xmlWriter.writeEndElement();
@@ -530,9 +528,9 @@ void DockManager::loadWidgetProperties(QXmlStreamReader &xmlReader, QWidget *wid
     if (!maxSize.isNull()) widget->setMaximumSize(maxSize);
 
     if (ColorDock *colorDock = qobject_cast<ColorDock*>(widget)) {
-        if (!customSizeHint.isNull()) {
-            colorDock->setCustomSizeHint(customSizeHint);
-        }
+        // if (!customSizeHint.isNull()) {
+        //     colorDock->setCustomSizeHint(customSizeHint);
+        // }
     }
 }
 

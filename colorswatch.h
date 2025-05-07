@@ -19,10 +19,6 @@ public:
     explicit ColorSwatch(const QString &colorName, QMainWindow *parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags());
     ~ColorSwatch();
 
-    // Property accessors
-    void setCustomSizeHint(const QSize &size);
-    QSize customSizeHint() const;
-
     void setFeatures(QDockWidget::DockWidgetFeatures features);
     QDockWidget::DockWidgetFeatures features() const;
 
@@ -35,12 +31,8 @@ public:
     QMenu *contextMenu() const { return m_menu; }
     QString colorName() const { return m_colorName; }
 
-    // Utility methods
     bool isAreaAllowed(Qt::DockWidgetArea area) const;
     void updateContextMenu();
-
-public slots:
-    void changeSizeHints();
 
 protected:
 #ifndef QT_NO_CONTEXTMENU
@@ -49,14 +41,12 @@ protected:
     void resizeEvent(QResizeEvent *e) override;
 
 private slots:
-    // Feature control
     void changeClosable(bool on);
     void changeMovable(bool on);
     void changeFloatable(bool on);
     void changeFloating(bool on);
     void changeVerticalTitleBar(bool on);
 
-    // Area control
     void allowLeft(bool a);
     void allowRight(bool a);
     void allowTop(bool a);
@@ -67,7 +57,6 @@ private slots:
     void placeTop(bool p);
     void placeBottom(bool p);
 
-    // Docking operations
     void splitInto(QAction *action);
     void tabInto(QAction *action);
 
@@ -81,7 +70,6 @@ private:
     QMainWindow *m_mainWindow;
     ColorDock *m_colorDock;
 
-    // Actions
     QAction *m_closableAction;
     QAction *m_movableAction;
     QAction *m_floatableAction;
@@ -100,7 +88,6 @@ private:
     QAction *m_topAction;
     QAction *m_bottomAction;
 
-    // Menus
     QMenu *m_tabMenu;
     QMenu *m_splitHMenu;
     QMenu *m_splitVMenu;
@@ -135,25 +122,13 @@ class ColorDock : public QFrame
 public:
     explicit ColorDock(const QString &color, QWidget *parent = nullptr);
 
-    // Add this function
     QString colorName() const { return m_color; }
-
-    QSize sizeHint() const override { return m_szHint; }
-    QSize minimumSizeHint() const override { return m_minSzHint; }
-
-    void setCustomSizeHint(const QSize &size);
-    QSize customSizeHint() const { return m_szHint; }
-
-public slots:
-    void changeSizeHints();
 
 protected:
     void paintEvent(QPaintEvent *) override;
 
 private:
     const QString m_color;
-    QSize m_szHint;
-    QSize m_minSzHint;
 };
 
 #endif // COLORSWATCH_H
