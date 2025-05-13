@@ -1,4 +1,3 @@
-// mainwindow.h (updated)
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -17,25 +16,21 @@ public:
     ~MainWindow();
 
 signals:
-    void shown();
+    void windowShown();
 
 protected:
     void closeEvent(QCloseEvent *event) override;
     void showEvent(QShowEvent *event) override;
 
 private slots:
-    void saveLayout();
-    void saveLayoutAs();
-    void loadLayout();
-    void loadLayout1();
-    void loadLayout2();
-    void loadLayout3();
-    void loadLayout4();
-    void loadLayout5();
+    void handleLayoutOperation(const QString &fileName);
 
 private:
+    void initializeWindow();
     void setupCentralWidget();
-    void setupStatusBar();  // ADD THIS DECLARATION
+    void setupManagers();
+    void connectSignals();
+    void loadDefaultLayout();
 
     DockManager *m_dockManager;
     LayoutManager *m_layoutManager;

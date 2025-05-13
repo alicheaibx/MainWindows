@@ -13,6 +13,7 @@ class LayoutManager : public QObject
 
 public:
     explicit LayoutManager(QMainWindow *parent = nullptr);
+
     void saveLayoutToFile(const QString &fileName);
     void loadLayoutFromFile(const QString &fileName);
 
@@ -21,10 +22,10 @@ signals:
     void loadDockWidgetsLayoutRequested(QXmlStreamReader &xmlReader);
 
 private:
-    void saveMainWindowGeometry(QXmlStreamWriter &xmlWriter);
-    void loadMainWindowGeometry(QXmlStreamReader &xmlReader);
-    void saveCentralWidgetProperties(QXmlStreamWriter &xmlWriter);
-    void loadCentralWidgetProperties(QXmlStreamReader &xmlReader);
+    void saveMainWindowState(QXmlStreamWriter &xmlWriter);
+    void loadMainWindowState(QXmlStreamReader &xmlReader);
+    void saveCentralWidgetState(QXmlStreamWriter &xmlWriter);
+    void loadCentralWidgetState(QXmlStreamReader &xmlReader);
 
     QMainWindow *m_mainWindow;
 };

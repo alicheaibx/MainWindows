@@ -4,92 +4,67 @@
 <context>
     <name>ColorSwatch</name>
     <message>
-        <location filename="colorswatch.cpp" line="123"/>
+        <location filename="colorswatch.cpp" line="111"/>
         <source>Closable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="colorswatch.cpp" line="127"/>
+        <location filename="colorswatch.cpp" line="115"/>
         <source>Movable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="colorswatch.cpp" line="131"/>
+        <location filename="colorswatch.cpp" line="119"/>
         <source>Floatable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="colorswatch.cpp" line="135"/>
+        <location filename="colorswatch.cpp" line="123"/>
         <source>Floating</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="colorswatch.cpp" line="139"/>
-        <source>Vertical title bar</source>
+        <location filename="colorswatch.cpp" line="130"/>
+        <source>Allow Left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="colorswatch.cpp" line="146"/>
-        <source>Allow on Left</source>
+        <location filename="colorswatch.cpp" line="134"/>
+        <source>Allow Right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="colorswatch.cpp" line="150"/>
-        <source>Allow on Right</source>
+        <location filename="colorswatch.cpp" line="138"/>
+        <source>Allow Top</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="colorswatch.cpp" line="142"/>
+        <source>Allow Bottom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="colorswatch.cpp" line="154"/>
-        <source>Allow on Top</source>
+        <source>Place Left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="colorswatch.cpp" line="158"/>
-        <source>Allow on Bottom</source>
+        <source>Place Right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="colorswatch.cpp" line="170"/>
-        <source>Place on Left</source>
+        <location filename="colorswatch.cpp" line="162"/>
+        <source>Place Top</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="colorswatch.cpp" line="174"/>
-        <source>Place on Right</source>
+        <location filename="colorswatch.cpp" line="166"/>
+        <source>Place Bottom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="colorswatch.cpp" line="178"/>
-        <source>Place on Top</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="colorswatch.cpp" line="182"/>
-        <source>Place on Bottom</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="colorswatch.cpp" line="200"/>
-        <source>Tab into</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="colorswatch.cpp" line="203"/>
-        <source>Split horizontally into</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="colorswatch.cpp" line="206"/>
-        <source>Split vertically into</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="colorswatch.cpp" line="209"/>
-        <source>Modified</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="colorswatch.cpp" line="216"/>
+        <location filename="colorswatch.cpp" line="183"/>
         <source>Raise</source>
         <translation type="unfinished"></translation>
     </message>
@@ -105,14 +80,14 @@
 <context>
     <name>LayoutManager</name>
     <message>
-        <location filename="layoutmanager.cpp" line="18"/>
-        <location filename="layoutmanager.cpp" line="40"/>
+        <location filename="layoutmanager.cpp" line="16"/>
+        <location filename="layoutmanager.cpp" line="39"/>
         <location filename="layoutmanager.cpp" line="62"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="layoutmanager.cpp" line="18"/>
+        <location filename="layoutmanager.cpp" line="17"/>
         <source>Failed to open %1 for writing</source>
         <translation type="unfinished"></translation>
     </message>
@@ -122,7 +97,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="layoutmanager.cpp" line="62"/>
+        <location filename="layoutmanager.cpp" line="63"/>
         <source>Failed to parse XML file: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -135,158 +110,106 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="71"/>
+        <location filename="mainwindow.cpp" line="39"/>
         <source>This is the central widget.
 
 You can dock other widgets around this area.
 Use the View menu to toggle dock widgets.
-Layouts can be saved and loaded from the File menu.
-Use the buttons below to quickly switch between layouts.</source>
+Layouts can be saved and loaded from the File menu.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="82"/>
-        <source>Save Layout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwindow.cpp" line="82"/>
-        <source>Layout saved to layout.xml</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwindow.cpp" line="87"/>
-        <location filename="mainwindow.cpp" line="90"/>
-        <source>Save Layout As</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwindow.cpp" line="87"/>
-        <location filename="mainwindow.cpp" line="96"/>
-        <source>XML Files (*.xml)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwindow.cpp" line="90"/>
+        <location filename="mainwindow.cpp" line="85"/>
         <source>Layout saved to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="96"/>
-        <location filename="mainwindow.cpp" line="99"/>
-        <source>Load Layout</source>
+        <location filename="mainwindow.cpp" line="85"/>
+        <location filename="mainwindow.cpp" line="89"/>
+        <source>Success</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="99"/>
+        <location filename="mainwindow.cpp" line="92"/>
+        <source>File not found: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="89"/>
         <source>Layout loaded from %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="108"/>
-        <source>layout.xml not found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwindow.cpp" line="108"/>
-        <location filename="mainwindow.cpp" line="117"/>
-        <location filename="mainwindow.cpp" line="126"/>
-        <location filename="mainwindow.cpp" line="135"/>
-        <location filename="mainwindow.cpp" line="144"/>
+        <location filename="mainwindow.cpp" line="92"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwindow.cpp" line="117"/>
-        <source>layout2.xml not found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwindow.cpp" line="126"/>
-        <source>layout3.xml not found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwindow.cpp" line="135"/>
-        <source>layout4.xml not found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwindow.cpp" line="144"/>
-        <source>layout5.xml not found</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>MenuManager</name>
     <message>
-        <location filename="menumanager.cpp" line="20"/>
+        <location filename="menumanager.cpp" line="19"/>
         <source>&amp;File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="menumanager.cpp" line="22"/>
+        <location filename="menumanager.cpp" line="24"/>
+        <location filename="menumanager.cpp" line="67"/>
         <source>Save Layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="menumanager.cpp" line="25"/>
+        <location filename="menumanager.cpp" line="21"/>
         <source>Save Layout As...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="menumanager.cpp" line="28"/>
+        <location filename="menumanager.cpp" line="30"/>
         <source>Load Layout...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="menumanager.cpp" line="32"/>
+        <location filename="menumanager.cpp" line="40"/>
         <source>&amp;Quit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="menumanager.cpp" line="38"/>
+        <location filename="menumanager.cpp" line="45"/>
         <source>Layouts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="menumanager.cpp" line="76"/>
-        <source>Layout 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="menumanager.cpp" line="77"/>
-        <source>Layout 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="menumanager.cpp" line="78"/>
-        <source>Layout 3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="menumanager.cpp" line="79"/>
-        <source>Layout 4</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="menumanager.cpp" line="80"/>
-        <source>Layout 5</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="menumanager.cpp" line="97"/>
+        <location filename="menumanager.cpp" line="51"/>
         <source>Presets:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="menumanager.cpp" line="108"/>
+        <location filename="menumanager.cpp" line="64"/>
         <source>Save Current</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="menumanager.cpp" line="109"/>
+        <location filename="menumanager.cpp" line="73"/>
         <source>Load Custom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="menumanager.cpp" line="24"/>
+        <location filename="menumanager.cpp" line="33"/>
+        <location filename="menumanager.cpp" line="67"/>
+        <location filename="menumanager.cpp" line="76"/>
+        <source>Layout Files (*.xml)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="menumanager.cpp" line="33"/>
+        <location filename="menumanager.cpp" line="76"/>
+        <source>Load Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="menumanager.cpp" line="54"/>
+        <source>Layout %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

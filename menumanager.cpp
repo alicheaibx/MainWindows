@@ -1,15 +1,14 @@
 #include "menumanager.h"
 #include <QMenuBar>
 #include <QAction>
-#include <QMainWindow>
 #include <QToolBar>
 #include <QPushButton>
 #include <QLabel>
+#include <QFileDialog>
 
 MenuManager::MenuManager(QMainWindow *parent)
     : QObject(parent),
-    m_mainWindow(parent),
-    m_layoutToolBar(nullptr)
+    m_mainWindow(parent)
 {
     setupMenuBar();
     setupLayoutToolBar();
@@ -19,14 +18,23 @@ void MenuManager::setupMenuBar()
 {
     QMenu *fileMenu = m_mainWindow->menuBar()->addMenu(tr("&File"));
 
-    QAction *saveLayoutAction = fileMenu->addAction(tr("Save Layout"));
-    connect(saveLayoutAction, &QAction::triggered, this, &MenuManager::saveLayoutRequested);
+    QAction *saveAction = fileMenu->addAction(tr("Save Layout As..."));
+    connect(saveAction, &QAction::triggered, this, [this]() {
+        QString fileName = QFileDialog::getSaveFileName(m_mainWindow,
+                                                        tr("Save Layout"), "", tr("Layout Files (*.xml)"));
+        if (!fileName.isEmpty()) {
+            emit layoutOperationRequested("save:" + fileName);
+        }
+    });
 
-    QAction *saveLayoutAsAction = fileMenu->addAction(tr("Save Layout As..."));
-    connect(saveLayoutAsAction, &QAction::triggered, this, &MenuManager::saveLayoutAsRequested);
-
-    QAction *loadLayoutAction = fileMenu->addAction(tr("Load Layout..."));
-    connect(loadLayoutAction, &QAction::triggered, this, &MenuManager::loadLayoutRequested);
+    QAction *loadAction = fileMenu->addAction(tr("Load Layout..."));
+    connect(loadAction, &QAction::triggered, this, [this]() {
+        QString fileName = QFileDialog::getOpenFileName(m_mainWindow,
+                                                        tr("Load Layout"), "", tr("Layout Files (*.xml)"));
+        if (!fileName.isEmpty()) {
+            emit layoutOperationRequested(fileName);
+        }
+    });
 
     fileMenu->addSeparator();
     fileMenu->addAction(tr("&Quit"), m_mainWindow, &QWidget::close);
@@ -34,83 +42,43 @@ void MenuManager::setupMenuBar()
 
 void MenuManager::setupLayoutToolBar()
 {
-    // Create the toolbar with improved styling
-    m_layoutToolBar = new QToolBar(tr("Layouts"), m_mainWindow);
-    m_layoutToolBar->setObjectName("LayoutToolBar");
-    m_layoutToolBar->setStyleSheet(
-        "QToolBar {"
-        "   background: #f0f0f0;"
-        "   border-top: 1px solid #ccc;"
-        "   border-bottom: 1px solid #ccc;"
-        "   spacing: 5px;"
-        "   padding: 3px;"
-        "}"
-        "QToolButton {"
-        "   padding: 5px;"
-        "   margin: 2px;"
-        "}"
-        );
-    m_layoutToolBar->setMovable(false);
-    m_layoutToolBar->setFloatable(false);
-    m_layoutToolBar->setAllowedAreas(Qt::TopToolBarArea);
-    m_mainWindow->addToolBar(Qt::TopToolBarArea, m_layoutToolBar);
+    QToolBar *toolBar = new QToolBar(tr("Layouts"), m_mainWindow);
+    toolBar->setObjectName("LayoutToolBar");
+    toolBar->setMovable(false);
+    m_mainWindow->addToolBar(Qt::TopToolBarArea, toolBar);
 
-    // Button style
-    QString buttonStyle =
-        "QPushButton {"
-        "   padding: 6px;"
-        "   margin: 2px;"
-        "   min-width: 80px;"
-        "   background: #e0e0e0;"
-        "   border: 1px solid #aaa;"
-        "   border-radius: 3px;"
-        "}"
-        "QPushButton:hover {"
-        "   background: #d0d0d0;"
-        "}"
-        "QPushButton:pressed {"
-        "   background: #c0c0c0;"
-        "}";
+    // Add preset buttons
+    toolBar->addWidget(new QLabel(tr("Presets:")));
 
-    // Create layout buttons
-    QPushButton *btn1 = new QPushButton(tr("Layout 1"), m_mainWindow);
-    QPushButton *btn2 = new QPushButton(tr("Layout 2"), m_mainWindow);
-    QPushButton *btn3 = new QPushButton(tr("Layout 3"), m_mainWindow);
-    QPushButton *btn4 = new QPushButton(tr("Layout 4"), m_mainWindow);
-    QPushButton *btn5 = new QPushButton(tr("Layout 5"), m_mainWindow);
+    for (int i = 1; i <= 5; ++i) {
+        QPushButton *btn = new QPushButton(tr("Layout %1").arg(i), m_mainWindow);
+        connect(btn, &QPushButton::clicked, this, [this, i]() {
+            emit layoutOperationRequested(QString("layout%1.xml").arg(i));
+        });
+        toolBar->addWidget(btn);
+    }
 
-    // Apply style to buttons
-    btn1->setStyleSheet(buttonStyle);
-    btn2->setStyleSheet(buttonStyle);
-    btn3->setStyleSheet(buttonStyle);
-    btn4->setStyleSheet(buttonStyle);
-    btn5->setStyleSheet(buttonStyle);
-
-    // Connect buttons
-    connect(btn1, &QPushButton::clicked, this, &MenuManager::loadLayout1Requested);
-    connect(btn2, &QPushButton::clicked, this, &MenuManager::loadLayout2Requested);
-    connect(btn3, &QPushButton::clicked, this, &MenuManager::loadLayout3Requested);
-    connect(btn4, &QPushButton::clicked, this, &MenuManager::loadLayout4Requested);
-    connect(btn5, &QPushButton::clicked, this, &MenuManager::loadLayout5Requested);
-
-    // Add buttons to toolbar
-    m_layoutToolBar->addWidget(new QLabel(tr("Presets:")));
-    m_layoutToolBar->addWidget(btn1);
-    m_layoutToolBar->addWidget(btn2);
-    m_layoutToolBar->addWidget(btn3);
-    m_layoutToolBar->addWidget(btn4);
-    m_layoutToolBar->addWidget(btn5);
-
-    // Add separator
-    m_layoutToolBar->addSeparator();
+    toolBar->addSeparator();
 
     // Add save/load buttons
     QPushButton *saveBtn = new QPushButton(tr("Save Current"), m_mainWindow);
+    connect(saveBtn, &QPushButton::clicked, this, [this]() {
+        QString fileName = QFileDialog::getSaveFileName(m_mainWindow,
+                                                        tr("Save Layout"), "", tr("Layout Files (*.xml)"));
+        if (!fileName.isEmpty()) {
+            emit layoutOperationRequested("save:" + fileName);
+        }
+    });
+
     QPushButton *loadBtn = new QPushButton(tr("Load Custom"), m_mainWindow);
-    saveBtn->setStyleSheet(buttonStyle);
-    loadBtn->setStyleSheet(buttonStyle);
-    connect(saveBtn, &QPushButton::clicked, this, &MenuManager::saveLayoutAsRequested);
-    connect(loadBtn, &QPushButton::clicked, this, &MenuManager::loadLayoutRequested);
-    m_layoutToolBar->addWidget(saveBtn);
-    m_layoutToolBar->addWidget(loadBtn);
+    connect(loadBtn, &QPushButton::clicked, this, [this]() {
+        QString fileName = QFileDialog::getOpenFileName(m_mainWindow,
+                                                        tr("Load Layout"), "", tr("Layout Files (*.xml)"));
+        if (!fileName.isEmpty()) {
+            emit layoutOperationRequested(fileName);
+        }
+    });
+
+    toolBar->addWidget(saveBtn);
+    toolBar->addWidget(loadBtn);
 }

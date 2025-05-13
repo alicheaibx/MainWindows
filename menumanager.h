@@ -13,22 +13,15 @@ class MenuManager : public QObject
 
 public:
     explicit MenuManager(QMainWindow *parent = nullptr);
+
+signals:
+    void layoutOperationRequested(const QString &fileName);
+
+private:
     void setupMenuBar();
     void setupLayoutToolBar();
 
-signals:
-    void saveLayoutRequested();
-    void saveLayoutAsRequested();
-    void loadLayoutRequested();
-    void loadLayout1Requested();
-    void loadLayout2Requested();
-    void loadLayout3Requested();
-    void loadLayout4Requested();
-    void loadLayout5Requested();
-
-private:
     QMainWindow *m_mainWindow;
-    QToolBar *m_layoutToolBar;
 };
 
 #endif // MENUMANAGER_H

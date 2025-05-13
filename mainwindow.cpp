@@ -5,13 +5,8 @@
 #include <QTextEdit>
 #include <QFile>
 #include <QMessageBox>
-#include <QFileDialog>
-#include <QApplication>
-#include <QCloseEvent>
-#include <QShowEvent>
-#include <QDebug>
 #include <QTimer>
-
+#include<QCloseEvent>
 MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
     : QMainWindow(parent, flags)
 {
@@ -19,41 +14,7 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
     setWindowTitle("Qt Main Window Example");
     setDockNestingEnabled(true);
 
-    setupCentralWidget();
-
-    // Initialize managers
-    m_dockManager = new DockManager(this);
-    m_layoutManager = new LayoutManager(this);
-    m_menuManager = new MenuManager(this);
-
-    // Connect menu signals
-    connect(m_menuManager, &MenuManager::saveLayoutRequested, this, &MainWindow::saveLayout);
-    connect(m_menuManager, &MenuManager::saveLayoutAsRequested, this, &MainWindow::saveLayoutAs);
-    connect(m_menuManager, &MenuManager::loadLayoutRequested, this, &MainWindow::loadLayout);
-    connect(m_menuManager, &MenuManager::loadLayout1Requested, this, &MainWindow::loadLayout1);
-    connect(m_menuManager, &MenuManager::loadLayout2Requested, this, &MainWindow::loadLayout2);
-    connect(m_menuManager, &MenuManager::loadLayout3Requested, this, &MainWindow::loadLayout3);
-    connect(m_menuManager, &MenuManager::loadLayout4Requested, this, &MainWindow::loadLayout4);
-    connect(m_menuManager, &MenuManager::loadLayout5Requested, this, &MainWindow::loadLayout5);
-
-    // Connect layout manager signals to dock manager
-    connect(m_layoutManager, &LayoutManager::saveDockWidgetsLayoutRequested,
-            m_dockManager, &DockManager::saveDockWidgetsLayout);
-    connect(m_layoutManager, &LayoutManager::loadDockWidgetsLayoutRequested,
-            m_dockManager, &DockManager::loadDockWidgetsLayout);
-
-    // Connect the shown signal to load the layout after the window is visible
-    connect(this, &MainWindow::shown, this, [this]() {
-        QTimer::singleShot(100, this, [this]() {
-            QFile layoutFile("layout.xml");
-            if (layoutFile.exists()) {
-                qDebug() << "Loading layout.xml...";
-                m_layoutManager->loadLayoutFromFile("layout.xml");
-            } else {
-                qDebug() << "No layout.xml found";
-            }
-        });
-    }, Qt::QueuedConnection);
+    initializeWindow();
 }
 
 MainWindow::~MainWindow()
@@ -61,6 +22,13 @@ MainWindow::~MainWindow()
     delete m_dockManager;
     delete m_layoutManager;
     delete m_menuManager;
+}
+
+void MainWindow::initializeWindow()
+{
+    setupCentralWidget();
+    setupManagers();
+    connectSignals();
 }
 
 void MainWindow::setupCentralWidget()
@@ -71,77 +39,57 @@ void MainWindow::setupCentralWidget()
     center->setText(tr("This is the central widget.\n\n"
                        "You can dock other widgets around this area.\n"
                        "Use the View menu to toggle dock widgets.\n"
-                       "Layouts can be saved and loaded from the File menu.\n"
-                       "Use the buttons below to quickly switch between layouts."));
+                       "Layouts can be saved and loaded from the File menu."));
     setCentralWidget(center);
 }
 
-void MainWindow::saveLayout()
+void MainWindow::setupManagers()
 {
-    m_layoutManager->saveLayoutToFile("layout.xml");
-    QMessageBox::information(this, tr("Save Layout"), tr("Layout saved to layout.xml"));
+    m_dockManager = new DockManager(this);
+    m_layoutManager = new LayoutManager(this);
+    m_menuManager = new MenuManager(this);
 }
 
-void MainWindow::saveLayoutAs()
+void MainWindow::connectSignals()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Layout As"), "", tr("XML Files (*.xml)"));
-    if (!fileName.isEmpty()) {
-        m_layoutManager->saveLayoutToFile(fileName);
-        QMessageBox::information(this, tr("Save Layout As"), tr("Layout saved to %1").arg(fileName));
+    // Connect menu signals
+    connect(m_menuManager, &MenuManager::layoutOperationRequested,
+            this, &MainWindow::handleLayoutOperation);
+
+    // Connect layout manager signals to dock manager
+    connect(m_layoutManager, &LayoutManager::saveDockWidgetsLayoutRequested,
+            m_dockManager, &DockManager::saveDockWidgetsLayout);
+    connect(m_layoutManager, &LayoutManager::loadDockWidgetsLayoutRequested,
+            m_dockManager, &DockManager::loadDockWidgetsLayout);
+
+    // Load default layout after window is shown
+    connect(this, &MainWindow::windowShown, this, &MainWindow::loadDefaultLayout);
+}
+
+void MainWindow::loadDefaultLayout()
+{
+    QTimer::singleShot(100, this, [this]() {
+        if (QFile::exists("layout.xml")) {
+            m_layoutManager->loadLayoutFromFile("layout.xml");
+        }
+    });
+}
+
+void MainWindow::handleLayoutOperation(const QString &fileName)
+{
+    if (fileName.isEmpty()) return;
+
+    if (fileName.startsWith("save:")) {
+        QString saveFile = fileName.mid(5);
+        m_layoutManager->saveLayoutToFile(saveFile);
+        QMessageBox::information(this, tr("Success"), tr("Layout saved to %1").arg(saveFile));
     }
-}
-
-void MainWindow::loadLayout()
-{
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Load Layout"), "", tr("XML Files (*.xml)"));
-    if (!fileName.isEmpty()) {
+    else if (QFile::exists(fileName)) {
         m_layoutManager->loadLayoutFromFile(fileName);
-        QMessageBox::information(this, tr("Load Layout"), tr("Layout loaded from %1").arg(fileName));
+        QMessageBox::information(this, tr("Success"), tr("Layout loaded from %1").arg(fileName));
     }
-}
-
-void MainWindow::loadLayout1()
-{
-    if (QFile::exists("layout.xml")) {
-        m_layoutManager->loadLayoutFromFile("layout.xml");
-    } else {
-        QMessageBox::warning(this, tr("Error"), tr("layout.xml not found"));
-    }
-}
-
-void MainWindow::loadLayout2()
-{
-    if (QFile::exists("layout2.xml")) {
-        m_layoutManager->loadLayoutFromFile("layout2.xml");
-    } else {
-        QMessageBox::warning(this, tr("Error"), tr("layout2.xml not found"));
-    }
-}
-
-void MainWindow::loadLayout3()
-{
-    if (QFile::exists("layout3.xml")) {
-        m_layoutManager->loadLayoutFromFile("layout3.xml");
-    } else {
-        QMessageBox::warning(this, tr("Error"), tr("layout3.xml not found"));
-    }
-}
-
-void MainWindow::loadLayout4()
-{
-    if (QFile::exists("layout4.xml")) {
-        m_layoutManager->loadLayoutFromFile("layout4.xml");
-    } else {
-        QMessageBox::warning(this, tr("Error"), tr("layout4.xml not found"));
-    }
-}
-
-void MainWindow::loadLayout5()
-{
-    if (QFile::exists("layout5.xml")) {
-        m_layoutManager->loadLayoutFromFile("layout5.xml");
-    } else {
-        QMessageBox::warning(this, tr("Error"), tr("layout5.xml not found"));
+    else {
+        QMessageBox::warning(this, tr("Error"), tr("File not found: %1").arg(fileName));
     }
 }
 
@@ -153,5 +101,5 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::showEvent(QShowEvent *event)
 {
     QMainWindow::showEvent(event);
-    emit shown();
+    emit windowShown();
 }
