@@ -21,6 +21,7 @@ public:
     QMenu* viewMenu() const { return m_viewMenu; }
     QList<ColorSwatch*> dockWidgets() const { return m_dockWidgets; }
     ColorSwatch* dockWidget(const QString &name) const;
+    void setResizeEnabled(bool enabled);
 
 public slots:
     void saveDockWidgetsLayout(QXmlStreamWriter &xmlWriter);
@@ -47,6 +48,7 @@ private:
     QList<ColorSwatch*> m_dockWidgets;
     QMap<QAction*, ColorSwatch*> m_actionToDockWidgetMap;
     QMap<ColorSwatch*, Qt::DockWidgetArea> m_dockWidgetAreas;
+    bool m_resizeEnabled = false;
 };
 
 #endif // DOCKMANAGER_H

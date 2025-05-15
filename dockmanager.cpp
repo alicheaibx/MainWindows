@@ -19,6 +19,21 @@ DockManager::~DockManager()
     qDeleteAll(m_dockWidgets);
 }
 
+void DockManager::setResizeEnabled(bool enabled)
+{
+    m_resizeEnabled = enabled;
+    for (ColorSwatch *swatch : m_dockWidgets) {
+        if (enabled) {
+            swatch->setFeatures(swatch->features() | QDockWidget::DockWidgetMovable);
+            swatch->setMinimumSize(0, 0);
+            swatch->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+        } else {
+            swatch->setFeatures(swatch->features() & ~QDockWidget::DockWidgetMovable);
+            swatch->setFixedSize(swatch->size());
+        }
+    }
+}
+
 ColorSwatch* DockManager::dockWidget(const QString &name) const
 {
     for (ColorSwatch *swatch : m_dockWidgets) {
@@ -74,6 +89,7 @@ void DockManager::setupDockWidgets()
 void DockManager::saveDockWidgetsLayout(QXmlStreamWriter &xmlWriter)
 {
     xmlWriter.writeStartElement("DockWidgets");
+    xmlWriter.writeTextElement("ResizeEnabled", m_resizeEnabled ? "true" : "false");
 
     QSet<QDockWidget*> savedDockWidgets;
     for (ColorSwatch *dockWidget : m_dockWidgets) {
@@ -137,97 +153,110 @@ void DockManager::loadDockWidgetsLayout(QXmlStreamReader &xmlReader)
     }
 
     QMap<ColorSwatch*, QList<ColorSwatch*>> tabbedGroups;
+    bool resizeEnabled = m_resizeEnabled;
 
     while (xmlReader.readNextStartElement()) {
-        if (xmlReader.name() == "DockWidget") {
-            QString name = xmlReader.attributes().value("name").toString();
-            QString title;
-            bool visible = true;
-            bool floating = false;
-            QSize size;
-            QString dockAreaStr;
-            QPoint floatingPos;
-            QDockWidget::DockWidgetFeatures features = QDockWidget::DockWidgetClosable |
-                                                       QDockWidget::DockWidgetMovable |
-                                                       QDockWidget::DockWidgetFloatable;
-            Qt::DockWidgetAreas allowedAreas = Qt::AllDockWidgetAreas;
-
+        if (xmlReader.name() == "DockWidgets") {
             while (xmlReader.readNextStartElement()) {
-                QString elementName = xmlReader.name().toString();
-                if (elementName == "WidgetProperties") {
-                    if (dockWidgetMap.contains(name)) {
-                        loadWidgetProperties(xmlReader, dockWidgetMap[name]->widget());
-                    } else {
-                        xmlReader.skipCurrentElement();
-                    }
-                } else if (elementName == "Title") {
-                    title = xmlReader.readElementText();
-                } else if (elementName == "Visible") {
-                    visible = xmlReader.readElementText() == "true";
-                } else if (elementName == "Floating") {
-                    floating = xmlReader.readElementText() == "true";
-                } else if (elementName == "Features") {
-                    features = static_cast<QDockWidget::DockWidgetFeatures>(xmlReader.readElementText().toInt());
-                } else if (elementName == "AllowedAreas") {
-                    allowedAreas = static_cast<Qt::DockWidgetAreas>(xmlReader.readElementText().toInt());
-                } else if (elementName == "Size") {
+                if (xmlReader.name() == "ResizeEnabled") {
+                    resizeEnabled = xmlReader.readElementText() == "true";
+                    setResizeEnabled(resizeEnabled);
+                }
+                else if (xmlReader.name() == "DockWidget") {
+                    QString name = xmlReader.attributes().value("name").toString();
+                    QString title;
+                    bool visible = true;
+                    bool floating = false;
+                    QSize size;
+                    QString dockAreaStr;
+                    QPoint floatingPos;
+                    QDockWidget::DockWidgetFeatures features = QDockWidget::DockWidgetClosable |
+                                                               QDockWidget::DockWidgetMovable |
+                                                               QDockWidget::DockWidgetFloatable;
+                    Qt::DockWidgetAreas allowedAreas = Qt::AllDockWidgetAreas;
+
                     while (xmlReader.readNextStartElement()) {
-                        if (xmlReader.name() == "width") {
-                            size.setWidth(xmlReader.readElementText().toInt());
-                        } else if (xmlReader.name() == "height") {
-                            size.setHeight(xmlReader.readElementText().toInt());
-                        }
-                    }
-                } else if (elementName == "DockArea") {
-                    dockAreaStr = xmlReader.readElementText();
-                } else if (elementName == "Geometry") {
-                    while (xmlReader.readNextStartElement()) {
-                        if (xmlReader.name() == "x") {
-                            floatingPos.setX(xmlReader.readElementText().toInt());
-                        } else if (xmlReader.name() == "y") {
-                            floatingPos.setY(xmlReader.readElementText().toInt());
-                        }
-                    }
-                } else if (elementName == "TabbedGroup") {
-                    QList<ColorSwatch*> tabbedGroup;
-                    while (xmlReader.readNextStartElement()) {
-                        if (xmlReader.name() == "DockWidget") {
-                            QString tabbedName = xmlReader.readElementText();
-                            if (dockWidgetMap.contains(tabbedName)) {
-                                tabbedGroup.append(dockWidgetMap[tabbedName]);
+                        QString elementName = xmlReader.name().toString();
+                        if (elementName == "WidgetProperties") {
+                            if (dockWidgetMap.contains(name)) {
+                                loadWidgetProperties(xmlReader, dockWidgetMap[name]->widget());
+                            } else {
+                                xmlReader.skipCurrentElement();
+                            }
+                        } else if (elementName == "Title") {
+                            title = xmlReader.readElementText();
+                        } else if (elementName == "Visible") {
+                            visible = xmlReader.readElementText() == "true";
+                        } else if (elementName == "Floating") {
+                            floating = xmlReader.readElementText() == "true";
+                        } else if (elementName == "Features") {
+                            features = static_cast<QDockWidget::DockWidgetFeatures>(xmlReader.readElementText().toInt());
+                        } else if (elementName == "AllowedAreas") {
+                            allowedAreas = static_cast<Qt::DockWidgetAreas>(xmlReader.readElementText().toInt());
+                        } else if (elementName == "Size") {
+                            while (xmlReader.readNextStartElement()) {
+                                if (xmlReader.name() == "width") {
+                                    size.setWidth(xmlReader.readElementText().toInt());
+                                } else if (xmlReader.name() == "height") {
+                                    size.setHeight(xmlReader.readElementText().toInt());
+                                }
+                            }
+                        } else if (elementName == "DockArea") {
+                            dockAreaStr = xmlReader.readElementText();
+                        } else if (elementName == "Geometry") {
+                            while (xmlReader.readNextStartElement()) {
+                                if (xmlReader.name() == "x") {
+                                    floatingPos.setX(xmlReader.readElementText().toInt());
+                                } else if (xmlReader.name() == "y") {
+                                    floatingPos.setY(xmlReader.readElementText().toInt());
+                                }
+                            }
+                        } else if (elementName == "TabbedGroup") {
+                            QList<ColorSwatch*> tabbedGroup;
+                            while (xmlReader.readNextStartElement()) {
+                                if (xmlReader.name() == "DockWidget") {
+                                    QString tabbedName = xmlReader.readElementText();
+                                    if (dockWidgetMap.contains(tabbedName)) {
+                                        tabbedGroup.append(dockWidgetMap[tabbedName]);
+                                    }
+                                }
+                            }
+                            if (dockWidgetMap.contains(name)) {
+                                tabbedGroups[dockWidgetMap[name]] = tabbedGroup;
                             }
                         }
                     }
+
                     if (dockWidgetMap.contains(name)) {
-                        tabbedGroups[dockWidgetMap[name]] = tabbedGroup;
+                        ColorSwatch *dockWidget = dockWidgetMap[name];
+                        dockWidget->setWindowTitle(title);
+                        dockWidget->setVisible(visible);
+                        dockWidget->setFeatures(features);
+                        dockWidget->setAllowedAreas(allowedAreas);
+
+                        if (size.isValid()) {
+                            if (resizeEnabled) {
+                                dockWidget->resize(size);
+                            } else {
+                                dockWidget->setFixedSize(size);
+                            }
+                        }
+
+                        if (floating) {
+                            dockWidget->setFloating(true);
+                            if (!floatingPos.isNull()) {
+                                dockWidget->move(floatingPos);
+                            }
+                        } else {
+                            Qt::DockWidgetArea area = Qt::LeftDockWidgetArea;
+                            if (dockAreaStr == "Right") area = Qt::RightDockWidgetArea;
+                            else if (dockAreaStr == "Top") area = Qt::TopDockWidgetArea;
+                            else if (dockAreaStr == "Bottom") area = Qt::BottomDockWidgetArea;
+
+                            m_mainWindow->addDockWidget(area, dockWidget);
+                            m_dockWidgetAreas[dockWidget] = area;
+                        }
                     }
-                }
-            }
-
-            if (dockWidgetMap.contains(name)) {
-                ColorSwatch *dockWidget = dockWidgetMap[name];
-                dockWidget->setWindowTitle(title);
-                dockWidget->setVisible(visible);
-                dockWidget->setFeatures(features);
-                dockWidget->setAllowedAreas(allowedAreas);
-
-                if (size.isValid()) {
-                    dockWidget->resize(size);
-                }
-
-                if (floating) {
-                    dockWidget->setFloating(true);
-                    if (!floatingPos.isNull()) {
-                        dockWidget->move(floatingPos);
-                    }
-                } else {
-                    Qt::DockWidgetArea area = Qt::LeftDockWidgetArea;
-                    if (dockAreaStr == "Right") area = Qt::RightDockWidgetArea;
-                    else if (dockAreaStr == "Top") area = Qt::TopDockWidgetArea;
-                    else if (dockAreaStr == "Bottom") area = Qt::BottomDockWidgetArea;
-
-                    m_mainWindow->addDockWidget(area, dockWidget);
-                    m_dockWidgetAreas[dockWidget] = area;
                 }
             }
         }

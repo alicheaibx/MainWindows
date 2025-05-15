@@ -24,6 +24,7 @@ public:
     Qt::DockWidgetAreas allowedAreas() const;
 
     QString colorName() const { return m_colorName; }
+    void setResizeEnabled(bool enabled);
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event) override;
@@ -53,6 +54,7 @@ private:
     QMainWindow *m_mainWindow;
     ColorDock *m_colorDock;
     QMenu *m_menu;
+    bool m_resizeEnabled = true;
 
     QAction *m_closableAction;
     QAction *m_movableAction;

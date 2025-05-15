@@ -38,6 +38,13 @@ void MenuManager::setupMenuBar()
 
     fileMenu->addSeparator();
     fileMenu->addAction(tr("&Quit"), m_mainWindow, &QWidget::close);
+
+    // Add resize toggle to View menu
+    QMenu *viewMenu = m_mainWindow->menuBar()->addMenu(tr("&View"));
+    m_resizeAction = viewMenu->addAction(tr("Allow Resizing"));
+    m_resizeAction->setCheckable(true);
+    m_resizeAction->setChecked(m_resizeEnabled);
+    connect(m_resizeAction, &QAction::toggled, this, &MenuManager::setResizeEnabled);
 }
 
 void MenuManager::setupLayoutToolBar()
@@ -81,4 +88,13 @@ void MenuManager::setupLayoutToolBar()
 
     toolBar->addWidget(saveBtn);
     toolBar->addWidget(loadBtn);
+}
+
+void MenuManager::setResizeEnabled(bool enabled)
+{
+    if (m_resizeEnabled != enabled) {
+        m_resizeEnabled = enabled;
+        m_resizeAction->setChecked(enabled);
+        emit resizeEnabledChanged(enabled);
+    }
 }

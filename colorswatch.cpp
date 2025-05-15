@@ -3,6 +3,7 @@
 #include <QPainterPath>
 #include <QMainWindow>
 #include <QSignalBlocker>
+#include <QEvent>
 #include <qevent.h>
 
 QColor bgColorForName(const QString &name)
@@ -86,6 +87,20 @@ QDockWidget::DockWidgetFeatures ColorSwatch::features() const
 Qt::DockWidgetAreas ColorSwatch::allowedAreas() const
 {
     return QDockWidget::allowedAreas();
+}
+
+void ColorSwatch::setResizeEnabled(bool enabled)
+{
+    m_resizeEnabled = enabled;
+    if (enabled) {
+        setFeatures(features() | QDockWidget::DockWidgetMovable);
+        setMinimumSize(0, 0);
+        setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+    } else {
+        setFeatures(features() & ~QDockWidget::DockWidgetMovable);
+        setFixedSize(size());
+    }
+    updateContextMenu();
 }
 
 void ColorSwatch::setFeatures(QDockWidget::DockWidgetFeatures features)
@@ -203,6 +218,7 @@ void ColorSwatch::updateContextMenu()
     m_floatableAction->setChecked(features() & QDockWidget::DockWidgetFloatable);
     m_floatingAction->setChecked(isFloating());
     m_movableAction->setChecked(features() & QDockWidget::DockWidgetMovable);
+    m_movableAction->setEnabled(m_resizeEnabled);
 
     m_allowLeftAction->setChecked(areas & Qt::LeftDockWidgetArea);
     m_allowRightAction->setChecked(areas & Qt::RightDockWidgetArea);

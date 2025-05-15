@@ -14,14 +14,22 @@ class MenuManager : public QObject
 public:
     explicit MenuManager(QMainWindow *parent = nullptr);
 
+    bool isResizeEnabled() const { return m_resizeEnabled; }
+
 signals:
     void layoutOperationRequested(const QString &fileName);
+    void resizeEnabledChanged(bool enabled);
+
+private slots:
+    void setResizeEnabled(bool enabled);
 
 private:
     void setupMenuBar();
     void setupLayoutToolBar();
 
     QMainWindow *m_mainWindow;
+    QAction *m_resizeAction;
+    bool m_resizeEnabled = false;
 };
 
 #endif // MENUMANAGER_H

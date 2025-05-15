@@ -6,7 +6,8 @@
 #include <QFile>
 #include <QMessageBox>
 #include <QTimer>
-#include<QCloseEvent>
+#include <QCloseEvent>
+
 MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
     : QMainWindow(parent, flags)
 {
@@ -39,7 +40,8 @@ void MainWindow::setupCentralWidget()
     center->setText(tr("This is the central widget.\n\n"
                        "You can dock other widgets around this area.\n"
                        "Use the View menu to toggle dock widgets.\n"
-                       "Layouts can be saved and loaded from the File menu."));
+                       "Layouts can be saved and loaded from the File menu.\n"
+                       "Use the 'Allow Resizing' option to control widget movement."));
     setCentralWidget(center);
 }
 
@@ -56,6 +58,10 @@ void MainWindow::connectSignals()
     connect(m_menuManager, &MenuManager::layoutOperationRequested,
             this, &MainWindow::handleLayoutOperation);
 
+    // Connect resize signal
+    connect(m_menuManager, &MenuManager::resizeEnabledChanged,
+            m_dockManager, &DockManager::setResizeEnabled);
+
     // Connect layout manager signals to dock manager
     connect(m_layoutManager, &LayoutManager::saveDockWidgetsLayoutRequested,
             m_dockManager, &DockManager::saveDockWidgetsLayout);
@@ -69,8 +75,8 @@ void MainWindow::connectSignals()
 void MainWindow::loadDefaultLayout()
 {
     QTimer::singleShot(100, this, [this]() {
-        if (QFile::exists("layout.xml")) {
-            m_layoutManager->loadLayoutFromFile("layout.xml");
+        if (QFile::exists("layout1.xml")) {
+            m_layoutManager->loadLayoutFromFile("layout1.xml");
         }
     });
 }
@@ -82,11 +88,9 @@ void MainWindow::handleLayoutOperation(const QString &fileName)
     if (fileName.startsWith("save:")) {
         QString saveFile = fileName.mid(5);
         m_layoutManager->saveLayoutToFile(saveFile);
-        QMessageBox::information(this, tr("Success"), tr("Layout saved to %1").arg(saveFile));
     }
     else if (QFile::exists(fileName)) {
         m_layoutManager->loadLayoutFromFile(fileName);
-        QMessageBox::information(this, tr("Success"), tr("Layout loaded from %1").arg(fileName));
     }
     else {
         QMessageBox::warning(this, tr("Error"), tr("File not found: %1").arg(fileName));
