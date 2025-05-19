@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include "dockmanager.h"
 #include "layoutmanager.h"
 #include "menumanager.h"
 #include <QTextEdit>
@@ -20,7 +19,6 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
 
 MainWindow::~MainWindow()
 {
-    delete m_dockManager;
     delete m_layoutManager;
     delete m_menuManager;
 }
@@ -47,7 +45,6 @@ void MainWindow::setupCentralWidget()
 
 void MainWindow::setupManagers()
 {
-    m_dockManager = new DockManager(this);
     m_layoutManager = new LayoutManager(this);
     m_menuManager = new MenuManager(this);
 }
@@ -58,15 +55,9 @@ void MainWindow::connectSignals()
     connect(m_menuManager, &MenuManager::layoutOperationRequested,
             this, &MainWindow::handleLayoutOperation);
 
-    // Connect resize signal
+    // Connect resize signal directly to layout manager
     connect(m_menuManager, &MenuManager::resizeEnabledChanged,
-            m_dockManager, &DockManager::setResizeEnabled);
-
-    // Connect layout manager signals to dock manager
-    connect(m_layoutManager, &LayoutManager::saveDockWidgetsLayoutRequested,
-            m_dockManager, &DockManager::saveDockWidgetsLayout);
-    connect(m_layoutManager, &LayoutManager::loadDockWidgetsLayoutRequested,
-            m_dockManager, &DockManager::loadDockWidgetsLayout);
+            m_layoutManager, &LayoutManager::setResizeEnabled);
 
     // Load default layout after window is shown
     connect(this, &MainWindow::windowShown, this, &MainWindow::loadDefaultLayout);
